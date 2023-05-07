@@ -3,7 +3,8 @@ import lodash from "lodash";
 import base from "./base.js";
 import { segment } from "oicq";
 import fetch from "node-fetch";
-import puppeteer from "../../../lib/puppeteer/puppeteer.js";
+// import puppeteer from "../../../lib/puppeteer/puppeteer.js";
+import { getPuppeteer } from "../adapter/adapter.js"
 import common from "../../../lib/common/common.js";
 
 const _path = process.cwd();
@@ -454,6 +455,8 @@ export default class Mys extends base {
    */
   async render(param, isSplit, isWiki) {
     const pageHeight = 8000;
+
+    const puppeteer = getPuppeteer();
 
     await puppeteer.browserInit();
 
