@@ -12,7 +12,7 @@ git clone https://gitee.com/masuzuillust/xianxin-plugin.git ./plugins/xianxin-pl
 Github
 
 ```base
-git clone https://github.com/masuzuillust/xianxin-plugin.git ./plugins/xianxin-plugin/
+git clone https://github.com/ywstratus/xianxin-plugin.git ./plugins/xianxin-plugin/
 ```
 
 <p>以下为原README</p>
