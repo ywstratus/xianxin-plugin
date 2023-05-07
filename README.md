@@ -15,6 +15,15 @@ Github
 git clone https://github.com/ywstratus/xianxin-plugin.git ./plugins/xianxin-plugin/
 ```
 
+如需临时换源，请在xianxin-plugin目录下执行
+
+```base
+// Gitee源
+git remote set-url origin https://gitee.com/masuzuillust/xianxin-plugin.git
+// Github源
+git remote set-url origin https://github.com/ywstratus/xianxin-plugin.git
+```
+
 <p>以下为原README</p>
 
 
