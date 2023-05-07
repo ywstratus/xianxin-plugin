@@ -3,7 +3,7 @@ import lodash from "lodash";
 import xxCfg from "../model/xxCfg.js";
 import { segment } from "oicq";
 import base from "./base.js";
-import puppeteer from "../../../renderers/puppeteer/lib/puppeteer.js";
+import PuppeteerRenderer from "../../../renderers/puppeteer/lib/puppeteer.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
 
@@ -435,6 +435,16 @@ export default class Bilibili extends base {
    */
   async render(param) {
     const pageHeight = 8000;
+
+    const puppeteer = new PuppeteerRenderer({
+      headless: true,
+      args: [
+        '--disable-gpu',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--no-zygote'
+      ]
+    }); 
 
     await puppeteer.browserInit();
 
