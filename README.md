@@ -1,6 +1,18 @@
 <h2 align="left">写在前面：</h2>
 <p>此分支为受Miao-Yunzai（<a href="https://gitee.com/yoimiya-kokomi/Miao-Yunzai">Gitee</a> | <a href="https://github.com/yoimiya-kokomi/Miao-Yunzai">Github</a>）支持的xianxin插件（<a href="https://gitee.com/masuzuillust/xianxin-plugin">Gitee</a> | <a href="https://github.com/ywstratus/xianxin-plugin">Github</a>），同时支持原版与Miao版</p>
+##  安装与更新
+推荐使用 git 进行安装，以方便后续升级。在Miao-Yunzai根目录打开终端，运行如下命令进行安装。
+Gitee
+```base
+git clone https://gitee.com/masuzuillust/xianxin-plugin.git ./plugins/xianxin-plugin/
+```
+Github
+```base
+git clone https://github.com/masuzuillust/xianxin-plugin.git ./plugins/xianxin-plugin/
+```
 <p>以下为原README</p>
+
+
 
 <p align="center">
   <a href="https://gitee.com/xianxincoder/xianxin-plugin">
