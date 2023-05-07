@@ -3,13 +3,17 @@
 ##  安装与更新
 推荐使用 git 进行安装，以方便后续升级。在Miao-Yunzai根目录打开终端，运行如下命令进行安装。
 Gitee
+
 ```base
 git clone https://gitee.com/masuzuillust/xianxin-plugin.git ./plugins/xianxin-plugin/
 ```
+
 Github
+
 ```base
 git clone https://github.com/masuzuillust/xianxin-plugin.git ./plugins/xianxin-plugin/
 ```
+
 <p>以下为原README</p>
 
 
