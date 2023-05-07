@@ -1,3 +1,7 @@
+<h2 align="left">写在前面：</h2>
+<p>此分支为受Miao-Yunzai（<a href="https://gitee.com/yoimiya-kokomi/Miao-Yunzai">Gitee</a>|<a href="https://github.com/yoimiya-kokomi/Miao-Yunzai">Github</a>）支持的xianxin插件，同时支持原版与Miao版</p>
+<p>以下为原README</p>
+
 <p align="center">
   <a href="https://gitee.com/xianxincoder/xianxin-plugin">
     <img width="200" src="https://gitee.com/xianxincoder/xianxin-plugin/raw/master/resources/img/rank/top.png">
