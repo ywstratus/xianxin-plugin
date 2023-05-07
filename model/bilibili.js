@@ -3,7 +3,7 @@ import lodash from "lodash";
 import xxCfg from "../model/xxCfg.js";
 import { segment } from "oicq";
 import base from "./base.js";
-import puppeteer from "../../../lib/puppeteer/puppeteer.js";
+import puppeteer from "../../../renderers/puppeteer/lib/puppeteer.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
 
