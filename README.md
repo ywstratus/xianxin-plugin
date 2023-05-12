@@ -26,7 +26,7 @@ git remote set-url origin https://gitee.com/masuzuillust/xianxin-plugin.git
 git remote set-url origin https://github.com/ywstratus/xianxin-plugin.git
 ```
 
-换源请执行更新
+换源后请执行更新
 
 <p>以下为原README</p>
 
