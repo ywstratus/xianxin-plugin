@@ -8,7 +8,7 @@ let rendererCfg = null;
 
 function getTempDefaultRendererCfg() {
   return {
-    headless: true,
+    headless: 'new',
     args: [
       '--disable-gpu',
       '--disable-setuid-sandbox',
