@@ -6,8 +6,76 @@ import base from "./base.js";
 import { getPuppeteer } from "../adapter/adapter.js"
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
+import md5 from 'md5'
 
 const _path = process.cwd();
+
+const mixinKeyEncTab = [
+  46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+  33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
+  61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
+  36, 20, 34, 44, 52
+]
+
+// 对 imgKey 和 subKey 进行字符顺序打乱编码
+function getMixinKey(orig) {
+  let temp = ''
+  mixinKeyEncTab.forEach((n) => {
+      temp += orig[n]
+  })
+  return temp.slice(0, 32)
+}
+
+// 为请求参数进行 wbi 签名
+function encWbi(params, img_key, sub_key) {
+  const mixin_key = getMixinKey(img_key + sub_key),
+      curr_time = Math.round(Date.now() / 1000),
+      chr_filter = /[!'\(\)*]/g
+  let query = []
+  params = Object.assign(params, {wts: curr_time})    // 添加 wts 字段
+  // 按照 key 重排参数
+  Object.keys(params).sort().forEach((key) => {
+      query.push(
+          encodeURIComponent(key) +
+          '=' + 
+          // 过滤 value 中的 "!'()*" 字符
+          encodeURIComponent(('' + params[key]).replace(chr_filter, ''))
+      )
+  })
+  query = query.join('&')
+  const wbi_sign = md5(query + mixin_key) // 计算 w_rid
+  return query + '&w_rid=' + wbi_sign
+}
+
+// 获取最新的 img_key 和 sub_key
+async function getWbiKeys() {
+  const url = 'https://api.bilibili.com/x/web-interface/nav';
+  const resp = await fetch(url);
+  const json_content = await resp.json();
+  const img_url = json_content.data.wbi_img.img_url;
+  const sub_url = json_content.data.wbi_img.sub_url;
+  return {
+      img_key: img_url.substring(img_url.lastIndexOf('/') + 1, img_url.length).split('.')[0],
+      sub_key: sub_url.substring(sub_url.lastIndexOf('/') + 1, sub_url.length).split('.')[0]
+  }
+}
+
+let wbi_keys = {
+  key: null,
+  timeStamp: -1,
+}
+
+async function getQueryKey() {
+  const date = new Date();
+  if (!wbi_keys || date.getDate() != wbi_keys.timeStamp) {
+    wbi_keys.key = await getWbiKeys();
+    wbi_keys.timeStamp = date.getDate();
+  }
+  return encWbi({}, wbi_keys.key.img_key, wbi_keys.key.sub_key);
+}
+
+
+
 
 export default class Bilibili extends base {
   constructor(e) {
@@ -42,7 +110,8 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfo(uid) {
-    let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&jsonp=jsonp`;
+    const wrid = await getQueryKey();
+    let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}&jsonp=jsonp`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -68,7 +137,8 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfoDetail(uid) {
-    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}`;
+    const wrid = await getQueryKey();
+    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
     const response = await fetch(url, {
       method: "GET",
     });
@@ -76,25 +146,26 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliDynamicInfo(uid) {
-    let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
+    const wrid = await getQueryKey();
+    let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
         cookie:
-          "buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
+          "buvid3=DD3CC404-79DE-CC1A-F040-39CDB844077612251infoc; b_nut=1684597412; CURRENT_FNVAL=4048; _uuid=38573757-B3C10-E55E-9A82-9DF1C1029C5AE13067infoc; buvid4=AA295227-5F89-BBED-A055-DBEE1F98E12213263-023052023-NIYoAeSRf8aLqyA2eZyr9A%3D%3D; buvid_fp=cec9147ed2a85f4c0823f78324b0515a; rpdid=|(kmRYYJu)m|0J'uY)Rlm~RuY",
         pragma: "no-cache",
         "sec-ch-ua":
-          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+          ';Not A Brand";v="99", "Chromium";v="94',
         "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
+        "sec-ch-ua-platform": '"Windows"',
         "sec-fetch-dest": "document",
         "sec-fetch-mode": "navigate",
         "sec-fetch-site": "none",
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 Core/1.94.197.400 QQBrowser/11.7.5287.400",
       },
       redirect: "follow",
     });
