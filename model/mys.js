@@ -456,7 +456,7 @@ export default class Mys extends base {
   async render(param, isSplit, isWiki) {
     const pageHeight = 8000;
 
-    const puppeteer = getPuppeteer();
+    const puppeteer = await getPuppeteer();
 
     await puppeteer.browserInit();
 

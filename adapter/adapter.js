@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import yaml from 'yaml'
-import PuppeteerRenderer from "../../../renderers/puppeteer/lib/puppeteer.js";
+// import PuppeteerRenderer from "../../../renderers/puppeteer/lib/puppeteer.js";
 import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 
 let yunzaiEdition = null;
 let rendererCfg = null;
+let PuppeteerRendererClass = null;
 
 function getTempDefaultRendererCfg() {
   return {
@@ -59,9 +60,14 @@ function getYunzaiEdition() {
   return yunzaiEdition;
 }
 
-export function getPuppeteer() {
+async function initPuppeteerRenderer() {
+  PuppeteerRendererClass = await import('../../../renderers/puppeteer/lib/puppeteer.js');
+}
+
+export async function getPuppeteer() {
   if (getYunzaiEdition() == 'Miao-Yunzai') {
-    return new PuppeteerRenderer(getMiaoYunzaiRendererCfg());
+    if (!PuppeteerRendererClass) await initPuppeteerRenderer();
+    return new PuppeteerRendererClass(getMiaoYunzaiRendererCfg());
   }
   return puppeteer;
 }
