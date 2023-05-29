@@ -507,7 +507,7 @@ export default class Bilibili extends base {
   async render(param) {
     const pageHeight = 8000;
 
-    const puppeteer = getPuppeteer(); 
+    const puppeteer = await getPuppeteer(); 
 
     await puppeteer.browserInit();
 
