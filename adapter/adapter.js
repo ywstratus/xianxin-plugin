@@ -1,6 +1,5 @@
 import fs from 'node:fs'
 import yaml from 'yaml'
-// import PuppeteerRenderer from "../../../renderers/puppeteer/lib/puppeteer.js";
 import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 
 let yunzaiEdition = null;
