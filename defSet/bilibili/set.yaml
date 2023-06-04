@@ -26,3 +26,6 @@ banWords:
 
 # 设置B站动态消息模式 0 文字模式 1 图片模式
 pushMsgMode: 1
+
+# 自定义cookie
+customCookie:

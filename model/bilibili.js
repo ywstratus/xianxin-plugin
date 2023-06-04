@@ -17,64 +17,113 @@ const mixinKeyEncTab = [
   36, 20, 34, 44, 52
 ]
 
-// 对 imgKey 和 subKey 进行字符顺序打乱编码
-function getMixinKey(orig) {
-  let temp = ''
-  mixinKeyEncTab.forEach((n) => {
-      temp += orig[n]
-  })
-  return temp.slice(0, 32)
-}
+class BilibiliHelper {
+  static wbi_key = null;
+  static timeStamp = -1;
+  static tempCookie = null;
+  static cookieTimeStamp = -1;
 
-// 为请求参数进行 wbi 签名
-function encWbi(params, img_key, sub_key) {
-  const mixin_key = getMixinKey(img_key + sub_key),
-      curr_time = Math.round(Date.now() / 1000),
-      chr_filter = /[!'\(\)*]/g
-  let query = []
-  params = Object.assign(params, {wts: curr_time})    // 添加 wts 字段
-  // 按照 key 重排参数
-  Object.keys(params).sort().forEach((key) => {
-      query.push(
-          encodeURIComponent(key) +
-          '=' + 
-          // 过滤 value 中的 "!'()*" 字符
-          encodeURIComponent(('' + params[key]).replace(chr_filter, ''))
-      )
-  })
-  query = query.join('&')
-  const wbi_sign = md5(query + mixin_key) // 计算 w_rid
-  return query + '&w_rid=' + wbi_sign
-}
+  // 对 imgKey 和 subKey 进行字符顺序打乱编码
+  static getMixinKey(orig) {
+    let temp = ''
+    mixinKeyEncTab.forEach((n) => {
+        temp += orig[n]
+    })
+    return temp.slice(0, 32)
+  }
 
-// 获取最新的 img_key 和 sub_key
-async function getWbiKeys() {
-  const url = 'https://api.bilibili.com/x/web-interface/nav';
-  const resp = await fetch(url);
-  const json_content = await resp.json();
-  const img_url = json_content.data.wbi_img.img_url;
-  const sub_url = json_content.data.wbi_img.sub_url;
-  return {
-      img_key: img_url.substring(img_url.lastIndexOf('/') + 1, img_url.length).split('.')[0],
-      sub_key: sub_url.substring(sub_url.lastIndexOf('/') + 1, sub_url.length).split('.')[0]
+  // 为请求参数进行 wbi 签名
+  static encWbi(params, img_key, sub_key) {
+    const mixin_key = this.getMixinKey(img_key + sub_key),
+        curr_time = Math.round(Date.now() / 1000),
+        chr_filter = /[!'\(\)*]/g
+    let query = []
+    params = Object.assign(params, {wts: curr_time})    // 添加 wts 字段
+    // 按照 key 重排参数
+    Object.keys(params).sort().forEach((key) => {
+        query.push(
+            encodeURIComponent(key) +
+            '=' + 
+            // 过滤 value 中的 "!'()*" 字符
+            encodeURIComponent(('' + params[key]).replace(chr_filter, ''))
+        )
+    })
+    query = query.join('&')
+    const wbi_sign = md5(query + mixin_key) // 计算 w_rid
+    return query + '&w_rid=' + wbi_sign
+  }
+
+  // 获取最新的 img_key 和 sub_key
+  static async getWbiKeys() {
+    const url = 'https://api.bilibili.com/x/web-interface/nav';
+    const resp = await fetch(url);
+    const json_content = await resp.json();
+    const img_url = json_content.data.wbi_img.img_url;
+    const sub_url = json_content.data.wbi_img.sub_url;
+    return {
+        img_key: img_url.substring(img_url.lastIndexOf('/') + 1, img_url.length).split('.')[0],
+        sub_key: sub_url.substring(sub_url.lastIndexOf('/') + 1, sub_url.length).split('.')[0]
+    }
+  }
+
+  static CheckTimeStampOverTime() {
+    const date = new Date();
+    return date.getDate() != this.timeStamp;
+  }
+
+  static RefreshTimeStamp() {
+    const date = new Date();
+    this.timeStamp = date.getDate();
+  }
+
+  static async getQueryKey() {
+    const date = new Date();
+    if (!this.wbi_key || date.getDate() != this.timeStamp) {
+      this.wbi_key = await this.getWbiKeys();
+      this.timeStamp = date.getDate();
+    }
+    return this.encWbi({}, this.wbi_key.img_key, this.wbi_key.sub_key);
+  }
+
+  static async refreshTempCookie() {
+    const url = 'https://www.bilibili.com/';
+    const resp = await fetch(url, {
+      headers: {
+        "cache-control": "no-cache",
+        pragma: "no-cache",
+        "sec-ch-ua":
+          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": 1,
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+      }
+    });
+    this.tempCookie = resp.headers.get('set-cookie');
+    logger.mark(this.tempCookie);
+  }
+
+  static async getTempCookie() {
+    const setData = xxCfg.getConfig("bilibili", "set");
+    if (setData.customCookie) {
+      logger.mark(setData.customCookie);
+      return setData.customCookie;
+    } else {
+      logger.mark('Guanaa NO CustomCookie');
+    }
+    const date = new Date();
+    if (!this.tempCookie || date.getDate() != this.cookieTimeStamp) { // TODO
+      await this.refreshTempCookie();
+      this.cookieTimeStamp = date.getDate();
+    }
+    return this.tempCookie;
   }
 }
-
-let wbi_keys = {
-  key: null,
-  timeStamp: -1,
-}
-
-async function getQueryKey() {
-  const date = new Date();
-  if (!wbi_keys || date.getDate() != wbi_keys.timeStamp) {
-    wbi_keys.key = await getWbiKeys();
-    wbi_keys.timeStamp = date.getDate();
-  }
-  return encWbi({}, wbi_keys.key.img_key, wbi_keys.key.sub_key);
-}
-
-
 
 
 export default class Bilibili extends base {
@@ -84,13 +133,13 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliDetail(uid) {
+    const tempCookie = await BilibiliHelper.getTempCookie();
     let url = `https://api.bilibili.com/x/relation/stat?vmid=${uid}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie:
-          "buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
+        cookie: tempCookie,
         pragma: "no-cache",
         "sec-ch-ua":
           '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
@@ -102,7 +151,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
       },
       redirect: "follow",
     });
@@ -110,14 +159,14 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfo(uid) {
-    const wrid = await getQueryKey();
+    const wrid = await BilibiliHelper.getQueryKey();
+    const tempCookie = await BilibiliHelper.getTempCookie();
     let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}&jsonp=jsonp`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie:
-          "buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
+        cookie: tempCookie,
         pragma: "no-cache",
         "sec-ch-ua":
           '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
@@ -129,7 +178,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
       },
       redirect: "follow",
     });
@@ -137,23 +186,41 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfoDetail(uid) {
-    const wrid = await getQueryKey();
+    const wrid = await BilibiliHelper.getQueryKey();
+    const tempCookie = await BilibiliHelper.getTempCookie();
     let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
     const response = await fetch(url, {
       method: "GET",
+      headers: {
+        "cache-control": "no-cache",
+        cookie: tempCookie,
+        pragma: "no-cache",
+        "sec-ch-ua":
+          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": 1,
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+      },
+      redirect: "follow",
     });
     return response;
   }
 
   async getBilibiliDynamicInfo(uid) {
-    const wrid = await getQueryKey();
+    const wrid = await BilibiliHelper.getQueryKey();
+    const tempCookie = await BilibiliHelper.getTempCookie();
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie:
-          "buvid3=DD3CC404-79DE-CC1A-F040-39CDB844077612251infoc; b_nut=1684597412; CURRENT_FNVAL=4048; _uuid=38573757-B3C10-E55E-9A82-9DF1C1029C5AE13067infoc; buvid4=AA295227-5F89-BBED-A055-DBEE1F98E12213263-023052023-NIYoAeSRf8aLqyA2eZyr9A%3D%3D; buvid_fp=cec9147ed2a85f4c0823f78324b0515a; rpdid=|(kmRYYJu)m|0J'uY)Rlm~RuY",
+        cookie: tempCookie,
         pragma: "no-cache",
         "sec-ch-ua":
           ';Not A Brand";v="99", "Chromium";v="94',
@@ -165,7 +232,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 Core/1.94.197.400 QQBrowser/11.7.5287.400",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
       },
       redirect: "follow",
     });
@@ -173,13 +240,13 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUp(keyword) {
+    const tempCookie = await BilibiliHelper.getTempCookie();
     let url = `https://api.bilibili.com/x/web-interface/search/type?keyword=${keyword}&page=1&search_type=bili_user&order=totalrank&pagesize=5`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
         authority: "api.bilibili.com",
-        cookie:
-          "_uuid=04A91AF9-817E-5568-C260-F738C6992B3E65500infoc; buvid3=89F4F8FC-EC89-F339-53E0-BEB8917E839A65849infoc; buvid4=2D3B9929-A59A-751A-A267-64B84561875568042-022072912-ptQYXgw9NYmp0JTqr/FVmw%3D%3D; PVID=1; CURRENT_FNVAL=4048; nostalgia_conf=-1; i-wanna-go-back=-1; b_ut=7; innersign=0; b_lsid=D95BBB69_182DE35FC2B; fingerprint=8d0ef00128271df9bb681430277b95d0; buvid_fp_plain=undefined; buvid_fp=8d0ef00128271df9bb681430277b95d0",
+        cookie: tempCookie,
         "cache-control": "no-cache",
         pragma: "no-cache",
         "sec-ch-ua":
@@ -192,7 +259,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
       },
       redirect: "follow",
     });
