@@ -117,9 +117,7 @@ export class bilibili extends plugin {
     }
 
     // const res = await new Bilibili(this.e).getBilibiliUserInfo(uid);
-
     const res = await new Bilibili(this.e).getBilibiliDynamicInfo(uid);
-
     if (!res.ok) {
       this.e.reply("诶嘿，出了点网络问题，等会再试试吧~");
       return;
@@ -129,7 +127,7 @@ export class bilibili extends plugin {
 
     if (resJson.code != 0 || !resJson?.data) {
       this.e.reply(
-        "uid不对啊老兄，别乱搞哦～\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
+        `uid不对啊老兄，别乱搞哦～\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377\n ErrorCode: ${resJson.code}`
       );
       return;
     }
