@@ -1,15 +1,20 @@
 <h2 align="left">写在前面：</h2>
 <p>此分支为受Miao-Yunzai（<a href="https://gitee.com/yoimiya-kokomi/Miao-Yunzai">Gitee</a> | <a href="https://github.com/yoimiya-kokomi/Miao-Yunzai">Github</a>）支持的xianxin插件（<a href="https://gitee.com/masuzuillust/xianxin-plugin">Gitee</a> | <a href="https://github.com/ywstratus/xianxin-plugin">Github</a>），并且同时支持原版Yunzai。源分支等待PR中（原仓库没人管了，可能永远等不上了罢（悲））。</p>
 
+
 ## 关于B站推送Cookie失效导致失败的问题
 
 叔叔的风控升级，公共cookie可能无法使用。
+
 目前插件已支持配置Cookie，请在 /config/bilibili.set.yaml 下的 customCookie 字段添加本地浏览器登录b站后获取到的cookie。
 
 cookie的获取与设置：
-  1、在浏览器中登录自己的b站账号
-  2、处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入document.cookie并回车 -> 复制给到的文本
-  3、将给到的文本粘贴到 /config/bilibili.set.yaml 下的 customCookie 处，保存即可
+
+1. 在浏览器中登录自己的b站账号
+2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入document.cookie并回车 -> 复制给到的文本
+3. 将给到的文本粘贴到 /config/bilibili.set.yaml 下的 customCookie 处，保存即可
+
+
 
 ```base
 // customCookie举例
@@ -19,6 +24,8 @@ customCookie: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101
 如果没有customCookie，复制上方文本到 /config/bilibili.set.yaml 中，并替换后方的cookie后保存即可。
 
 自动cookie获取功能咕咕中...（其实写了，但不太好使）
+
+
 
 ##  安装与更新
 
