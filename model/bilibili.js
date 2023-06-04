@@ -105,16 +105,16 @@ class BilibiliHelper {
       }
     });
     this.tempCookie = resp.headers.get('set-cookie');
-    logger.mark(this.tempCookie);
+    // logger.mark(this.tempCookie);
   }
 
   static async getTempCookie() {
     const setData = xxCfg.getConfig("bilibili", "set");
     if (setData.customCookie) {
-      logger.mark(setData.customCookie);
+      // logger.mark(setData.customCookie);
       return setData.customCookie;
     } else {
-      logger.mark('Guanaa NO CustomCookie');
+      logger.mark('CustomCookie is Null');
     }
     const date = new Date();
     if (!this.tempCookie || date.getDate() != this.cookieTimeStamp) { // TODO
