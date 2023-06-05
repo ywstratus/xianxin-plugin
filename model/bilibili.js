@@ -221,7 +221,7 @@ export default class Bilibili extends base {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie: tempCookie,
+        cookie: convertCookie,
         pragma: "no-cache",
         "sec-ch-ua":
           ';Not A Brand";v="99", "Chromium";v="94',
