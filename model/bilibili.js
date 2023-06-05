@@ -215,6 +215,7 @@ export default class Bilibili extends base {
   async getBilibiliDynamicInfo(uid) {
     const wrid = await BilibiliHelper.getQueryKey();
     const tempCookie = await BilibiliHelper.getTempCookie();
+    const convertCookie = `${tempCookie}; DedeUserID=${uid};`
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
     const response = await fetch(url, {
       method: "GET",
