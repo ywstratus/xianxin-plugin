@@ -4,26 +4,24 @@
 
 ## 关于B站推送Cookie失效导致失败的问题
 
-叔叔的风控升级，公共cookie可能无法使用。
+叔叔的风控升级，插件目前已支持临时cookie的自动获取，但推送时依然有可能出现-352错误，如有必要，请使用自己的cookie。
 
-目前插件已支持配置Cookie，请在 /config/bilibili.set.yaml 下的 customCookie 字段添加本地浏览器登录b站后获取到的cookie。
+目前插件已支持配置自定义Cookie，请在`/config/bilibili.set.yaml`下的`customCookie`字段添加本地浏览器登录b站后获取到的cookie。
 
 cookie的获取与设置：
 
 1. 在浏览器中登录自己的b站账号
-2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入document.cookie并回车 -> 复制给到的文本
-3. 将给到的文本粘贴到 /config/bilibili.set.yaml 下的 customCookie 处，保存即可
+2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入`document.cookie`并回车 -> 复制给到的文本
+3. 将给到的文本粘贴到`/config/bilibili.set.yaml`下的`customCookie`处，保存即可
 
 
 
 ```base
-// customCookie举例
+// customCookie举例，实际cookie并不长这样
 customCookie: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0
 ```
 
-如果没有customCookie，复制上方文本到 /config/bilibili.set.yaml 中，并替换后方的cookie后保存即可。
-
-自动cookie获取功能咕咕中...（其实写了，但不太好使）
+如果没有`customCookie`，复制上方文本到`/config/bilibili.set.yaml`中，并替换后方的cookie后保存即可。
 
 
 
