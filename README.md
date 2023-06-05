@@ -14,6 +14,7 @@ cookie的获取与设置：
 2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入`document.cookie`并回车 -> 复制给到的文本
 3. 将给到的文本粘贴到`/config/bilibili.set.yaml`下的`customCookie`处，保存即可
 
+注意：cookie不带冒号
 
 
 ```base
