@@ -1,5 +1,5 @@
-<h2 align="left">写在前面：</h2>
-<p>此分支为受Miao-Yunzai（<a href="https://gitee.com/yoimiya-kokomi/Miao-Yunzai">Gitee</a> | <a href="https://github.com/yoimiya-kokomi/Miao-Yunzai">Github</a>）支持的xianxin插件（<a href="https://gitee.com/masuzuillust/xianxin-plugin">Gitee</a> | <a href="https://github.com/ywstratus/xianxin-plugin">Github</a>），并且同时支持原版Yunzai。源分支等待PR中（原仓库没人管了，可能永远等不上了罢（悲））。</p>
+<h2 align="left">写在前面</h2>
+<p>此分支为受Miao-Yunzai（<a href="https://gitee.com/yoimiya-kokomi/Miao-Yunzai">Gitee</a> | <a href="https://github.com/yoimiya-kokomi/Miao-Yunzai">Github</a>）支持的xianxin插件（<a href="https://gitee.com/masuzuillust/xianxin-plugin">Gitee</a> | <a href="https://github.com/ywstratus/xianxin-plugin">Github</a>），并且同时支持原版Yunzai。源分支等待PR中（原仓库没人管了，可能永远等不上了罢（悲））</p>
 
 
 ## 关于B站推送Cookie失效导致失败的问题
