@@ -5,6 +5,7 @@ import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 let yunzaiEdition = null;
 let rendererCfg = null;
 let puppeteerRendererClass = null;
+let puppeteerInst = null;
 
 function getTempDefaultRendererCfg() {
   return {
@@ -67,7 +68,8 @@ async function initPuppeteerRenderer() {
 export async function getPuppeteer() {
   if (getYunzaiEdition() == 'Miao-Yunzai') {
     if (!puppeteerRendererClass) await initPuppeteerRenderer();
-    return new puppeteerRendererClass(getMiaoYunzaiRendererCfg());
+    if (!puppeteerInst) puppeteerInst = new puppeteerRendererClass(getMiaoYunzaiRendererCfg());
+    return puppeteerInst;
   }
   return puppeteer;
 }
