@@ -151,7 +151,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
@@ -178,7 +178,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
@@ -188,7 +188,7 @@ export default class Bilibili extends base {
   async getBilibiliUserInfoDetail(uid) {
     const wrid = await BilibiliHelper.getQueryKey();
     const tempCookie = await BilibiliHelper.getTempCookie();
-    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
+    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -205,7 +205,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
@@ -215,8 +215,8 @@ export default class Bilibili extends base {
   async getBilibiliDynamicInfo(uid) {
     const wrid = await BilibiliHelper.getQueryKey();
     const tempCookie = await BilibiliHelper.getTempCookie();
-    const convertCookie = `${tempCookie}; DedeUserID=${uid};`
-    let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
+    const convertCookie = `SESSDATA=bilibili.com; ${tempCookie};`
+    let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -233,7 +233,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
@@ -260,7 +260,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
