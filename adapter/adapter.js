@@ -35,8 +35,8 @@ function getMiaoYunzaiRendererCfg() {
   return rendererCfg;
 }
 
-function getPm2Cfg() {
-  const configFile = './config/pm2/pm2.json';
+function getPkgCfg() {
+  const configFile = './package.json';
   if (fs.existsSync(configFile)) {
     let pmcfg = fs.readFileSync(configFile);
     pmcfg = JSON.parse(pmcfg);
@@ -46,7 +46,7 @@ function getPm2Cfg() {
 }
 
 function getStaticEditionTag() {
-  const pmcfg = getPm2Cfg();
+  const pmcfg = getPkgCfg();
   if (pmcfg) {
     return pmcfg.apps[0].name;
   }
@@ -66,7 +66,7 @@ async function initPuppeteerRenderer() {
 }
 
 export async function getPuppeteer() {
-  if (getYunzaiEdition() == 'Miao-Yunzai') {
+  if (getYunzaiEdition() == 'miao-yunzai') {
     if (!puppeteerRendererClass) await initPuppeteerRenderer();
     if (!puppeteerInst) puppeteerInst = new puppeteerRendererClass(getMiaoYunzaiRendererCfg());
     return puppeteerInst;
