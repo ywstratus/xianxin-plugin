@@ -48,7 +48,7 @@ function getPkgCfg() {
 function getStaticEditionTag() {
   const pmcfg = getPkgCfg();
   if (pmcfg) {
-    return pmcfg.apps[0].name;
+    return pmcfg.name;
   }
   return 'Yunzai-Bot';
 }
